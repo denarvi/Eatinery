@@ -1,0 +1,194 @@
+// Load the zipcodes and cities
+
+LOAD CSV WITH HEADERS FROM 'https://github.com/denarvi/eatinery_files/blob/main/Yelp_data.csv?plain=1' AS row 
+
+MERGE (z:ZipCode {zipcode: toInteger(row.zip)}) 
+MERGE (city:Primary_city {city_name:row.primary_city})
+SET z.state = row.state
+SET z.county = row.county
+MERGE (z)-[:is_in]->(city) 
+MERGE (city) – [:has_code] -> (z);
+
+
+// Link zipcodes with neighbors
+
+LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/denarvi/eatinery_files/main/neighbors.csv' AS row 
+
+MATCH (z1:ZipCode {zipcode: toInteger(row.zip_code)}) 
+MATCH (z2:ZipCode {zipcode: toInteger(row.neighbor)}) 
+MERGE (z1)<-[:is_neighbor_of]->(z2)
+
+
+// Load Attraction data 
+
+
+LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/denarvi/eatinery_files/main/tripadvisor_data_Indiana.csv' AS row 
+MERGE (attraction:Attraction {attraction_name: row.attraction_name}) 
+SET attraction.attraction_address = row.attraction_address
+SET attraction.attraction_rating = toFloat(row.attraction_rating)
+SET attraction.attraction_n_reviews = toInteger(row.attraction_n_reviews)
+SET attraction.attraction_url = row.attraction_url
+SET attraction.description = row.description
+SET attraction.top_review = row.top_review
+
+MERGE (z:ZipCode {zipcode: toInteger(row.zip_code)}) 
+MERGE (attraction)-[r:attraction_present_in]->(z)
+MERGE (z) - [r2:has_attraction] -> (attraction) 
+
+// Load Yelp data
+LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/denarvi/eatinery_files/main/Yelp_data.csv' AS row
+MERGE (restaurant:Restaurant {restaurant_name: row.restaurant_name})
+SET restaurant.restaurant_address = row.restaurant_address
+SET restaurant.average_rating = row.average_rating
+SET restaurant.n_reviews = row.n_reviews
+SET restaurant.price_level = row.price_level
+SET restaurant.take_out = row.Take_out
+SET restaurant.credit_cards = row.Credit_Cards
+SET restaurant.Reservations = row.Reservations
+SET restaurant.Outdoor = row.Outdoor
+SET restaurant.Pets = row.Pets
+SET restaurant.Walkins = row.Walkins
+SET restaurant.Parkings = row.Parkings
+SET restaurant.Delivery = row.Delivery
+SET restaurant.Wheelchair = row.Wheelchair
+SET restaurant.Group = row.Group
+SET restaurant.Vegetarian = row.Vegetarian
+SET restaurant.Casual = row.Casual
+SET restaurant.Classy = row.Classy
+SET restaurant.Catering = row.Catering
+SET restaurant.Main_cuisine = row.Cuisine_1
+SET restaurant.cuisine2 = row.Cuisine_2
+SET restaurant.cuisine3 = row.Cuisine_3
+SET restaurant.user_review = ""
+
+MERGE (z:ZipCode {zipcode: toInteger(row.zip_code)}) 
+MERGE (restaurant)-[r:restaurant_present_in]->(z) 
+MERGE (z) -[r2:has_restaurant] -> (restaurant)
+
+
+
+** FUNCTIONALITY **
+Restaurant Related
+
+KEEP IN MIND THAT ZIPCODE IS AN INT
+1)
+// Given a City and a Cuisine return the top 5 restaurants in that city
+
+MATCH (c:Primary_city {city_name: '$City_name'})<-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+WHERE r.Main_cuisine = '$Cuisine_type' OR r.cuisine2 = '$Cuisine_type' OR r.cuisine3 = '$Cuisine_type'
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+// Example
+MATCH (c:Primary_city {city_name: 'Bloomington'})<-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+WHERE r.Main_cuisine = 'Indian' OR r.cuisine2 = 'Indian' OR r.cuisine3 = 'Indian'
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+2)
+// Given a zip and a cuisine return the top restaurants in that city
+MATCH (z:ZipCode{zipcode: $zip_code})-[:has_restaurant]->(r:Restaurant)
+WHERE r.Main_cuisine = '$Cuisine_type' OR r.cuisine2 = '$Cuisine_type' OR r.cuisine3 = '$Cuisine_type'
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+// Example
+MATCH (z:ZipCode{zipcode: 47401})-[:has_restaurant]->(r:Restaurant)
+WHERE r.Main_cuisine = 'Indian' OR r.cuisine2 = 'Indian' OR r.cuisine3 = 'Indian'
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+
+3) Given a city return the top restaurants in it. 
+MATCH (c:Primary_city {city_name: $City_name})<-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+//Example
+MATCH (c:Primary_city {city_name: "Bloomington"})<-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+4) Given a zipcode return the top restaurants in it.
+MATCH (z:ZipCode{zipcode: $zip_code})-[:has_restaurant]->(r:Restaurant)
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+// Example
+MATCH (z:ZipCode{zipcode: 47401})-[:has_restaurant]->(r:Restaurant)
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+5) Given the name of an attraction and a cuisine, find restaurants closest to it. 
+MATCH (a:Attraction {attraction_name: "$Attraction_name"}) -[:attraction_present_in]->(z2:ZipCode)-[:is_in]->(c:Primary_city) <-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+WHERE r.Main_cuisine = '$Cuisine_type' OR r.cuisine2 = '$Cuisine_type' OR r.cuisine3 = '$Cuisine_type'
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+//Example
+MATCH (a:Attraction {attraction_name: "Tibetan Mongolian Buddhist Cultural Center"}) -[:attraction_present_in]->(z2:ZipCode)-[:is_in]->(c:Primary_city) <-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+WHERE r.Main_cuisine = 'Indian' OR r.cuisine2 = 'Indian' OR r.cuisine3 = 'Indian'
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+
+6) Given name of an attraction, find the best restaurants near it
+MATCH (a:Attraction {attraction_name: "$Attraction_name"}) -[:attraction_present_in]->(z2:ZipCode)-[:is_in]->(c:Primary_city) <-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+
+7) Given name of an attaction and a restaurant you like, find the best restaurants close to that 
+// 
+MATCH (attraction:Attraction {attraction_name: $Attraction_name})<-[:has_attraction]-(z:ZipCode)<-[:has_code]-(city:Primary_city)
+MATCH (restaurant:Restaurant {restaurant_name: $Restaurant_name})
+WITH city, restaurant
+MATCH (other_restaurant:Restaurant)-[:restaurant_present_in]->(z3:ZipCode)-[:is_in]->(city)
+WHERE other_restaurant.Main_cuisine = restaurant.Main_cuisine OR other_restaurant.cuisine2 = restaurant.Main_cuisine OR other_restaurant.cuisine3 = restaurant.Main_cuisine and other_restaurant <> restaurant
+RETURN other_restaurant.restaurant_name, other_restaurant.average_rating, other_restaurant.restaurant_address, other_restaurant.url,other_restaurant.price_level
+ORDER BY other_restaurant.average_rating DESC
+LIMIT 5
+
+
+
+//Example
+MATCH (attraction:Attraction {attraction_name: "Children's Museum of Indianapolis"})<-[:has_attraction]-(z:ZipCode)<-[:has_code]-(city:Primary_city)
+MATCH (restaurant:Restaurant {restaurant_name: 'Taste of India'})
+WITH city, restaurant
+MATCH (other_restaurant:Restaurant)-[:restaurant_present_in]->(z3:ZipCode)-[:is_in]->(city)
+WHERE other_restaurant.Main_cuisine = restaurant.Main_cuisine OR other_restaurant.cuisine2 = restaurant.Main_cuisine OR other_restaurant.cuisine3 = restaurant.Main_cuisine and other_restaurant <> restaurant
+RETURN other_restaurant.restaurant_name, other_restaurant.average_rating, other_restaurant.restaurant_address, other_restaurant.url,other_restaurant.price_level
+ORDER BY other_restaurant.average_rating DESC
+LIMIT 5
+
+
+8) Given an attraction name and a cuisine, find the best restaurants near that location
+
+MATCH (attraction:Attraction {attraction_name: $Attraction_name})<-[:has_attraction]-(z:ZipCode)<-[:has_code]-(city:Primary_city)
+WITH city
+MATCH (other_restaurant:Restaurant)-[:restaurant_present_in]->(z3:ZipCode)-[:is_in]->(city)
+WHERE other_restaurant.Main_cuisine = $Cuisine_type OR other_restaurant.cuisine2 = $Cuisine_type OR other_restaurant.cuisine3 = $Cuisine_type
+RETURN other_restaurant.restaurant_name, other_restaurant.average_rating, other_restaurant.restaurant_address, other_restaurant.url,other_restaurant.price_level
+ORDER BY other_restaurant.average_rating DESC
+LIMIT 5
+
+
+//Example
+MATCH (attraction:Attraction {attraction_name: "Children's Museum of Indianapolis"})<-[:has_attraction]-(z:ZipCode)<-[:has_code]-(city:Primary_city)
+WITH city
+MATCH (other_restaurant:Restaurant)-[:restaurant_present_in]->(z3:ZipCode)-[:is_in]->(city)
+WHERE other_restaurant.Main_cuisine = "Indian" OR other_restaurant.cuisine2 = "Indian" OR other_restaurant.cuisine3 = "Indian"
+RETURN other_restaurant.restaurant_name, other_restaurant.average_rating, other_restaurant.restaurant_address, other_restaurant.url,other_restaurant.price_level
+ORDER BY other_restaurant.average_rating DESC
+LIMIT 5

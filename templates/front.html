@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Impressive Dashboard</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background-color: #caf0f8; /* Pale blue background */
+      }
+      .slide-out {
+        animation: slideOut 0.5s forwards; /* Animation name, duration, and fill mode */
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-100%);
+        } /* Slide out to the left */
+      }
+      .welcome-message {
+        text-align: center;
+        position: absolute;
+        width: 100%;
+        top: 20px;
+        z-index: 10;
+        font-size: 24px;
+        color: #333;
+      }
+
+      .options {
+        text-align: center;
+        position: absolute;
+        width: 100%;
+        top: 50px;
+        z-index: 10;
+        font-size: 18px;
+        color: #555;
+      }
+
+      .button-container {
+        display: flex;
+        height: calc(100% - 70px);
+        position: absolute;
+        top: 70px;
+        width: 100%;
+      }
+
+      .button {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        cursor: pointer;
+        text-decoration: none;
+        color: black;
+        font-size: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .button:hover {
+        opacity: 0.8;
+      }
+
+      .button span {
+        margin-top: 30px; /* Space between the circle and text */
+        transition: transform 0.3s ease;
+      }
+
+      .button:hover span {
+        transform: scale(1.1);
+      }
+
+      .circle {
+        width: 200px; /* Increased circle size */
+        height: 200px; /* Increased circle size */
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        margin-bottom: 10px;
+        background-color: #fdfd96; /* Cream color background for circles */
+        border: 5px solid #f3f4f6; /* Border for the circles */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow to the circles */
+      }
+
+      /* Add your specific background-image URLs here */
+      .new-itinerary .circle {
+        background-image: url("/static/itinerary_2.png");
+      }
+
+      .past-itineraries .circle {
+        background-image: url("/static/past.png");
+      }
+
+      .restaurants .circle {
+        background-image: url("/static/restaurant.png");
+      }
+    </style>
+  </head>
+  <body>
+    <div class="welcome-message">Welcome!</div>
+    <div class="options">Explore your options:</div>
+
+    <div class="button-container">
+      <a href="{{ url_for('new_itinerary') }}" class="button new-itinerary">
+        <div class="circle"></div>
+        <span>Create a New Itinerary</span>
+      </a>
+      <a href="{{ url_for('restaurants') }}" class="button restaurants">
+        <div class="circle"></div>
+        <span>Explore Restaurants</span>
+      </a>
+      <a
+        href="{{ url_for('past_itineraries') }}"
+        class="button past-itineraries"
+      >
+        <div class="circle"></div>
+        <span>View Past Itineraries</span>
+      </a>
+    </div>
+    <script>
+      // Function to handle click event on buttons
+      function handleButtonClick(event) {
+        event.preventDefault(); // Prevent default anchor behavior
+        var target = event.currentTarget.getAttribute("href"); // Get the href attribute of the clicked button
+
+        // Add the slide-out class to the button container to start the animation
+        document.querySelector(".button-container").classList.add("slide-out");
+
+        // Wait for the animation to complete before changing the location
+        setTimeout(function () {
+          window.location.href = target; // Redirect to the target page
+        }, 500); // This should match the duration of the animation
+      }
+
+      // Add click event listeners to the buttons
+      document.querySelectorAll(".button").forEach(function (button) {
+        button.addEventListener("click", handleButtonClick);
+      });
+    </script>
+  </body>
+</html>

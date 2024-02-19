@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Results</title>
+    <style>
+      .card {
+        margin: 10px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .buttons-container {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      /* Styling for the buttons */
+      button {
+        padding: 12px 20px;
+        margin: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #bfed80;
+      }
+      .container .card h2 {
+        font-family: "lobster", cursive; /* Use a cursive font-family */
+      }
+      .container .card h1 {
+        font-family: "lobster", cursive; /* Use a cursive font-family */
+      }
+      .card:nth-child(1) {
+        background-color: #fbdcdc; /* pastel pink */
+      }
+
+      .card:nth-child(2) {
+        background-color: #cde7f0; /* pastel blue */
+      }
+
+      .card:nth-child(3) {
+        background-color: #f9e5c7; /* pastel orange */
+      }
+
+      .card:nth-child(4) {
+        background-color: #e0edc5; /* pastel green */
+      }
+
+      .card:nth-child(5) {
+        background-color: #f7e1f8; /* pastel purple */
+      }
+      .card:nth-child(6) {
+        background-color: #e7f8e1; /* pastel purple */
+      }
+      .card:nth-child(7) {
+        background-color: #f7cbb4; /* pastel purple */
+      }
+      .card:nth-child(8) {
+        background-color: #bad2fe; /* pastel purple */
+      }
+      .card:nth-child(9) {
+        background-color: #f09ef4; /* pastel purple */
+      }
+      .card:nth-child(10) {
+        background-color: #fbdcdc; /* pastel purple */
+      }
+
+      .card h3 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .card p {
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+
+      .card a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+
+      .card a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="buttons-container">
+        <button id="show-restaurants">Top Restaurants</button>
+        <button id="show-attractions">Top Attractions</button>
+      </div>
+      <div id="restaurants-container" style="display: none">
+        {% for restaurant in results2 %}
+        <div class="card">
+          <h1>{{ restaurant['r.restaurant_name'] }}</h1>
+          <p>Average Rating: {{ restaurant['r.average_rating'] }}</p>
+          <p>Address: {{ restaurant['r.restaurant_address'] }}</p>
+          <p>Main Cuisine: {{restaurant['r.Main_cuisine']}}</p>
+          <p>
+            <a href="{{ restaurant['r.url'] }}" target="_blank"
+              >Visit Website</a
+            >
+          </p>
+          <p>Price Level: {{ restaurant['r.price_level'] }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      <div id="attractions-container">
+        {% for result in results1 %}
+        <div class="card">
+          <h2>{{ result['r.attraction_name'] }}</h2>
+          <p>{{ result['r.description'] }}</p>
+          <p><strong>Rating:</strong> {{ result['r.attraction_rating'] }}</p>
+          <p><strong>Address:</strong> {{ result['r.attraction_address'] }}</p>
+
+          <p><strong>Top Review:</strong> {{ result['r.top_review'] }}</p>
+          <p>
+            <a href="{{ result['r.attraction_url'] }}" target="_blank"
+              >More Info</a
+            >
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById("show-restaurants")
+        .addEventListener("click", function () {
+          document.getElementById("restaurants-container").style.display =
+            "block";
+          document.getElementById("attractions-container").style.display =
+            "none";
+        });
+
+      document
+        .getElementById("show-attractions")
+        .addEventListener("click", function () {
+          document.getElementById("restaurants-container").style.display =
+            "none";
+          document.getElementById("attractions-container").style.display =
+            "block";
+        });
+    </script>
+    <a href="{{ url_for('front') }}">Back to Dashboard</a>
+  </body>
+</html>

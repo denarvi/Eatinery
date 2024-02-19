@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Itinerary</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-image: url("/static/itinerary_b.png"); /* Add the path to your background image */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: white; /* Adjust text color for readability */
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        padding-top: 50px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      form {
+        background: rgba(0, 0, 0, 0.7); /* Translucent background for form */
+        padding: 20px;
+        border-radius: 8px;
+      }
+
+      label,
+      input {
+        display: block;
+        width: 94%;
+        margin-bottom: 10px;
+      }
+
+      input[type="text"] {
+        padding: 10px;
+        border-radius: 2px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: black;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50; /* Green background */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #45a049; /* Slightly darker green on hover */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form method="post" action="{{ url_for('new_itinerary') }}">
+        <label for="location">Create a New Itinerary</label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          placeholder="Enter a location"
+          required
+        />
+        <br />
+        <button type="submit">Create Itinerary</button>
+      </form>
+    </div>
+  </body>
+</html>

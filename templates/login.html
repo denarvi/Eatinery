@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url("/static/background.png");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        .container {
+            width: 500px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .tab:hover {
+            background-color: #ddd;
+        }
+
+        .tab-content {
+            display: none;
+        }
+.overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .overlay h1 {
+            color: #fff;
+            font-family: 'Brush Script MT', cursive; /* Example cursive font */
+            font-size: 48px;
+            margin: 20px 0;
+        }
+
+        .overlay button {
+            padding: 10px 20px;
+            font-size: 24px;
+            color: #fff;
+            background-color: #4caf50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .overlay button:hover {
+            background-color: #66bb6a;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .active-tab {
+            background-color: #fff;
+            border-bottom: 1px solid #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .active-tab-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="overlay" id="overlay">
+    <h1>Eatinerary: Your food-based Itinerary planning app</h1>
+    <button onclick="getStarted()">Get Started</button>
+</div>
+<div class="container">
+    <div class="tabs">
+        <div class="tab " onclick="showTab('login-tab')">Login</div>
+        <div class="tab" onclick="showTab('signup-tab')">Sign Up</div>
+    </div>
+
+<!-- Update the form actions -->
+<div id="login-tab" class="tab-content active-tab-content">
+    <form action="{{ url_for('login') }}" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="submit" value="Login">
+    </form>
+</div>
+
+<div id="signup-tab" class="tab-content">
+    <form action="{{ url_for('signup') }}" method="post">
+        <input type="text" name="fullname" placeholder="User name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="submit" value="Sign Up">
+    </form>
+</div>
+
+
+<script>
+    function showTab(tabId) {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => tab.classList.remove('active-tab'));
+
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => content.classList.remove('active-tab-content'));
+
+        const selectedTab = document.querySelector('#' + tabId);
+        selectedTab.classList.add('active-tab');
+        document.getElementById(tabId).classList.add('active-tab-content');
+    }
+        function getStarted() {
+        document.getElementById('overlay').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>

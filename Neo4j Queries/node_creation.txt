@@ -1,0 +1,65 @@
+// Load the zipcodes and cities
+
+LOAD CSV WITH HEADERS FROM 'file:///Users/aravind/Documents/ADT_Datasets/Final_datasets/zipcodes.csv' AS row 
+
+MERGE (z:ZipCode {zipcode: toInteger(row.zip)}) 
+MERGE (city:Primary_city {city_name:row.primary_city})
+SET z.state = row.state
+SET z.county = row.county
+MERGE (z)-[:is_in]->(city) 
+MERGE (city) – [:has_code] -> (z);
+
+
+// Link zipcodes with neighbors
+
+LOAD CSV WITH HEADERS FROM 'file:///Users/aravind/Documents/ADT_Datasets/Final_datasets/neighbors.csv' AS row 
+
+MATCH (z1:ZipCode {zipcode: toInteger(row.zip_code)}) 
+MATCH (z2:ZipCode {zipcode: toInteger(row.neighbor)}) 
+MERGE (z1)<-[:is_neighbor_of]->(z2)
+
+
+// Load Attraction data 
+
+
+LOAD CSV WITH HEADERS FROM 'file:///Users/aravind/Documents/ADT_Datasets/Final_datasets/tripadvisor_data_indiana.csv' AS row 
+MERGE (attraction:Attraction {attraction_name: row.attraction_name}) 
+SET attraction.attraction_address = row.attraction_address
+SET attraction.attraction_rating = toFloat(row.attraction_rating)
+SET attraction.attraction_n_reviews = toInteger(row.attraction_n_reviews)
+SET attraction.attraction_url = row.attraction_url
+SET attraction.description = row.description
+SET attraction.top_review = row.top_review
+
+MERGE (z:ZipCode {zipcode: toInteger(row.zip_code)}) 
+MERGE (attraction)-[r:attraction_present_in]->(z)
+MERGE (z) - [r2:has_attraction] -> (attraction) 
+
+// Load Yelp data
+LOAD CSV WITH HEADERS FROM 'file:///Users/aravind/Documents/ADT_Datasets/Final_datasets/Yelp_data.csv' AS row
+MERGE (restaurant:Restaurant {restaurant_name: row.restaurant_name})
+SET restaurant.restaurant_address = row.restaurant_address
+SET restaurant.average_rating = row.average_rating
+SET restaurant.n_reviews = row.n_reviews
+SET restaurant.price_level = row.price_level
+SET restaurant.take_out = row.Take_out
+SET restaurant.credit_cards = row.Credit_Cards
+SET restaurant.Reservations = row.Reservations
+SET restaurant.Outdoor = row.Outdoor
+SET restaurant.Pets = row.Pets
+SET restaurant.Walkins = row.Walkins
+SET restaurant.Parkings = row.Parkings
+SET restaurant.Delivery = row.Delivery
+SET restaurant.Wheelchair = row.Wheelchair
+SET restaurant.Group = row.Group
+SET restaurant.Vegetarian = row.Vegetarian
+SET restaurant.Casual = row.Casual
+SET restaurant.Classy = row.Classy
+SET restaurant.Catering = row.Catering
+SET restaurant.Main_cuisine = row.Cuisine_1
+SET restaurant.cuisine2 = row.Cuisine_2
+SET restaurant.cuisine3 = row.Cuisine_3
+
+MERGE (z:ZipCode {zipcode: toInteger(row.zip_code)}) 
+MERGE (restaurant)-[r:restaurant_present_in]->(z) 
+MERGE (z) -[r2:has_restaurant] -> (restaurant)

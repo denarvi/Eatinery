@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurants</title>
+  </head>
+  <body>
+    <h1>Find Similar Restaurants</h1>
+    <form method="post" action="{{ url_for('restaurants') }}">
+      <label for="search_option">Search Option:</label>
+
+      <br />
+      <label for="location_name">Location Name:</label>
+      <select id="search_option" name="search_option" required>
+        <option value="city">City</option>
+        <option value="attraction">Attraction</option>
+        <option value="zipcode">Zipcode</option>
+      </select>
+      <input type="text" id="location_name" name="location_name" required />
+      <br />
+      <label for="cuisine">Cuisine/Restaurants:</label>
+      <select id="search_CR" name="search_CR" required>
+        <option value="cuisine">Cuisine</option>
+        <option value="restaurants">Restaurants</option>
+      </select>
+      <input type="text" id="cuisine" name="cuisine" required />
+      <br />
+      <input type="submit" value="Search" />
+    </form>
+
+    {% if selected_option %}
+    <p>Selected Search Option: {{ selected_option }}</p>
+    {% endif %}
+
+    <h2>Similar Restaurants</h2>
+    <h1>hii {{similar_restaurants}}</h1>
+    <ul>
+      {% for restaurant in similar_restaurants %}
+      <li>{{ restaurant.restaurant_name }}</li>
+      {% endfor %}
+    </ul>
+    <a href="dashboard.html">Back to Dashboard</a>
+  </body>
+</html>

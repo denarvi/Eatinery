@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Past Itineraries</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .info-container {
+        display: none;
+        width: 100%;
+        justify-content: space-around;
+        flex-wrap: wrap; /* Wrap items if they don't fit in one line */
+      }
+      .info-section {
+        width: 45%; /* Adjust width for side-by-side layout */
+      }
+
+      .cuisine-icon {
+        max-width: 100%; /* Ensure image fits within its container */
+        height: auto;
+        display: block; /* Makes the image fit its container width */
+        margin: 0 auto; /* Center the image */
+      }
+      .main-card {
+        width: 80%;
+        height: 200px;
+        margin: 10px;
+        padding: 15px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Remove border radius for full width */
+      }
+
+      .main-card h2 {
+        position: absolute;
+        color: white;
+        font-family: "Cursive", sans-serif; /* Ensure you have a cursive font available */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .delete-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .delete-button:hover {
+        background-color: darkred;
+      }
+      .no-itineraries {
+        margin-top: 50px;
+        text-align: center;
+      }
+      .info-container {
+        display: flex;
+        width: 100%;
+        justify-content: space-evenly;
+      }
+
+      .card {
+        background-color: #f9f9f9;
+        margin: 10px;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 45%; /* Adjust width for side-by-side layout */
+      }
+
+      .cuisine-icon {
+        width: 50px;
+        height: auto;
+      }
+
+      h2,
+      h3 {
+        margin: 5px 0;
+      }
+
+      a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    {% if past_restaurants or past_attractions %}
+    <div
+      id="main-card"
+      class="main-card"
+      onclick="toggleDetails()"
+      style="background-image: url('/static/bloomington.png')"
+    >
+      <h2>{{location}}</h2>
+      <button onclick="deleteItinerary('{{ location }}')" class="delete-button">
+        X
+      </button>
+      <!-- Dynamically set this based on location -->
+    </div>
+    <div class="info-container">
+      <div id="restaurant-info" class="info-container">
+        {% for restaurant in past_restaurants %}
+        <div class="card">
+          <img
+            class="cuisine-icon"
+            src="{{ '/static/' + {
+                'Indian': 'Indian.png',
+                'Mexican': 'Mexican.png',
+                'Thai': 'Thai.png',
+                'Chinese': 'Chinese.png',
+                'Fast Food': 'fastfood.png',
+                'Italian': 'Italian.png',
+                'Pizza': 'Italian.png',
+                'American': 'American.png',
+                'Afghan': 'Afghan.png',
+                'Nepalese': 'nepalese.png',
+                'Japanese': 'japanese.png',
+                'Breweries': 'brewery.png',
+                'Gastropubs': 'brewery.png',
+                'Bakeries': 'bakery.png',
+                'Breakfast & Brunch': 'breakfast.png',
+                'Sushi Bars': 'japanese.png',
+                'Barbeque': 'American.png',
+                'Buffets': 'generic.png',
+                'Burgers':'American.png',
+                'Wine Bars': 'brewery.png'
+                }.get(restaurant['r.Main_cuisine'], 'generic.png') }}"
+            alt="Cuisine Icon"
+          />
+          <h3>{{ restaurant['r.restaurant_name'] }}</h3>
+          <p>Average Rating: {{ restaurant['r.average_rating'] }}</p>
+          <p>Address: {{ restaurant['r.restaurant_address'] }}</p>
+          <p>Main Cuisine: {{restaurant['r.Main_cuisine']}}</p>
+          <p>
+            <a href="{{ restaurant['r.url'] }}" target="_blank"
+              >Visit Website</a
+            >
+          </p>
+          <p>Price Level: {{ restaurant['r.price_level'] }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="attraction-info" class="info-container">
+        {% for result in past_attractions %}
+        <div class="card">
+          <h2>{{ result['r.attraction_name'] }}</h2>
+          <p><strong>Rating:</strong> {{ result['r.attraction_rating'] }}</p>
+          <p><strong>Address:</strong> {{ result['r.attraction_address'] }}</p>
+          <p>
+            <a href="{{ result['r.attraction_url'] }}" target="_blank"
+              >More Info</a
+            >
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="no-itineraries">
+      <h2>No Past Itineraries</h2>
+    </div>
+    {% endif %}
+    <script>
+      function toggleDetails() {
+        var infoContainer = document.querySelector(".info-container");
+        infoContainer.style.display =
+          infoContainer.style.display === "none" ? "flex" : "none";
+      }
+      function deleteItinerary(locationId) {
+        if (confirm("Are you sure you want to delete this itinerary?")) {
+          fetch("/delete_itinerary/" + locationId, {
+            method: "DELETE",
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                // Redirect or update the UI after successful deletion
+                window.location.href = "/past_itineraries";
+              }
+            })
+            .catch((error) => console.error("Error:", error));
+        }
+      }
+    </script>
+  </body>
+</html>

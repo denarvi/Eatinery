@@ -1,0 +1,16 @@
+# Itinerary 
+
+// Find the best restaurants at a location
+MATCH (c:Primary_city {city_name: $city_name})<-[:is_in]-(z:ZipCode)-[:has_restaurant]->(r:Restaurant)
+RETURN r.restaurant_name, r.average_rating, r.restaurant_address, r.url,r.price_level
+ORDER BY r.average_rating DESC
+LIMIT 5
+
+
+
+// Find the best attractions at a location
+MATCH (c:Primary_city {city_name: $city_name})<-[:is_in]-(z:ZipCode)-[:has_attraction]->(r:Attraction)
+RETURN r.attraction_name, r.attraction_rating, r.attraction_address, r.attraction_url,r.top_review, r.description
+ORDER BY r.attraction_rating DESC
+LIMIT 5
+
