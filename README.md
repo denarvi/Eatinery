@@ -5,18 +5,18 @@ Eatinerary is a web application designed to revolutionize the way travelers plan
 ## Features
 
 - **User Authentication**: Secure login and signup functionalities.
-![](Picture 1.png)
-![](Picture 2.png)
+![](Picture1.png)
+![](Picture2.png)
 - **Itinerary Creation**: Custom itineraries based on location and preferences.
-![](Picture 3.png)
-![](Picture 4.png)
+![](Picture3.png)
+![](Picture4.png)
 - **Restaurant Recommendations**: Tailored suggestions from an extensive database.
-![](Picture 5.png)
-![](Picture 6.png)
+![](Picture5.png)
+![](Picture6.png)
 - **Reviews**: Share your dining experiences.
 - **Attraction-Based Searches**: Discover restaurants near popular attractions.
 - **Past Itineraries**: Access and manage your previous plans.
-![](Picture 7.png)
+![](Picture7.png)
 
 ![](Ardend_ADT.mp4)
 ## Technologies
